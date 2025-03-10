@@ -30,28 +30,28 @@ It is recommended to use Ubuntu18.04 to compile sonic_pad_os, and install the re
 "sudo apt install git gcc gawk flex libc6:i386 libstdc++6:i386 lib32z1 libncurses5 libncurses5-dev python g++ libz-dev libssl-dev make p7zip-full"
 
 1. Download the code:
-   1 git lfs install
-   2 git clone https://github.com/CrealityTech/sonic_pad_os.git
+   1. git lfs install
+   2. git clone https://github.com/CrealityTech/sonic_pad_os.git
 3. Enter the root directory of sonic_pad_os
 4. create a "dl" folder
-   1 mkdir ./sonic_pad_os/dl
-   2 NOTE: This repo will include the "dl" directory, most of these notes are from the original repo
+   1. mkdir ./sonic_pad_os/dl
+   2. NOTE: This repo will include the "dl" directory, most of these notes are from the original repo
 5. Download the dl package, save the downloaded dl package in the sonic_pad_os/dl directory.
-   1 Download link: https://klipper.cxswyjy.com/download/sonic_dl/
-   2 NOTE: This repo will include these files allong with any other needed packages in the "dl" folder already so you do not have to download them seperatly
+   1. Download link: https://klipper.cxswyjy.com/download/sonic_dl/
+   2. NOTE: This repo will include these files allong with any other needed packages in the "dl" folder already so you do not have to download them seperatly
 6. I found that I needed to change the permissions (and the owner in some cases) of the files when I copy thime from a share folder in my VM.  since this is a VM just for this build, I didn't mind
-   1 sudo chmod 777 -R ./dl/
-   2 sudo chown "YourUserName":"YourUserName" -R ./dl/
+   1. sudo chmod 777 -R ./dl/
+   2. sudo chown "YourUserName":"YourUserName" -R ./dl/
 7. Create a blank ".lunchrc" file in your user dir (I don't know why this isn't created automaticly but "lunch" will not work without it)
-   1 vim ~/.lunchrc
-   2 save and exit vim
+   1. vim ~/.lunchrc
+   2. save and exit vim
 8. Execute the prep script
-   1 ./scripts/prepare.sh
+   1. ./scripts/prepare.sh
 9. Compile steps:
-   1 source ./build/envsetup.sh
-   2 lunch 6
-   3 make -j2 && pack
-   4 swupdate_pack_swu -ab
+   1. source ./build/envsetup.sh
+   2. lunch 6
+   3. make -j2 && pack
+   4. swupdate_pack_swu -ab
 10. U flash drive upgrade method: Copy the config.ini and t800-sonic_lcd-ab_1.0.6.48.57.swu files in the sonic_pad_os/out/r818-sonic_lcd/ directory to the root directory of the U flash drive. The firmware version number must be greater than the current version number of the device, otherwise the upgrade box will not pop up.
 11. Computer upgrade method: The image path generated after compilation is sonic_pad_os/out/r818-sonic_lcd/t800-sonic_lcd_uart0.img, please refer to the link for the burning tool and upgrade method: https://github.com/CrealityOfficial/Creality_Sonic_Pad_Firmware
 

@@ -1,0 +1,133 @@
+name: RELEASE
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run lint
+        run: |
+          npm run lint -- --no-fix
+
+      - name: Run tests
+        run: |
+          npm run test:unit
+
+      - name: Run circular references check
+        run: |
+          npm run circular-check
+
+      - name: Build
+        run: |
+          npm run build
+
+      - name: Create Artifact
+        run: |
+          cd ./dist
+          zip -r ../fluidd.zip ./
+
+      - name: Get version from tag
+        id: tag_name
+        run: |
+          echo "current_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Read ChangeLog
+        uses: mindsers/changelog-reader-action@v2.2.3
+        id: changelog
+        with:
+          validation_depth: 1
+          version: ${{ steps.tag_name.outputs.current_version }}
+          path: ./CHANGELOG.md
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: |
+            ${{ steps.changelog.outputs.changes }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./fluidd.zip
+          asset_name: fluidd.zip
+          asset_content_type: application/zip
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluidd-${{ github.sha }}.zip
+          path: ./dist
+
+      - name: Publish Release
+        uses: eregon/publish-release@v1.0.6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.create_release.outputs.id }}
+
+  publish-web:
+    name: Deploy to Host
+    needs: build
+    if: ${{ github.repository == 'fluidd-core/fluidd' }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download fluidd.zip
+        uses: actions/download-artifact@v4
+        with:
+          name: fluidd-${{ github.sha }}.zip
+          path: ./dist
+
+      - name: Prepare Deploy
+        run: |
+          cp ./server/config.json ./dist/config.json
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+
+      - name: Deploy to Host
+        uses: reggionick/s3-deploy@v4
+        with:
+          folder: dist
+          bucket: ${{ secrets.S3_BUCKET_NAME }}
+          bucket-region: us-east-1
+          dist-id: ${{ secrets.CF_DISTRIBUTION_ID }}
+          delete-removed: true
+          no-cache: true
+          private: true

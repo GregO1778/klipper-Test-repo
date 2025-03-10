@@ -1,0 +1,881 @@
+# This file contains pin mappings for the Creality CR-10S Pro. To use
+# this config, the firmware should be compiled for the AVR atmega2560.
+
+# See docs/Config_Reference.md for a description of parameters.
+
+[virtual_sdcard]
+path: ~/gcode_files
+#on_error_gcode:
+
+#[sdcard_loop]
+
+[display_status]
+
+[stepper_x]
+step_pin: PF0
+dir_pin: PF1
+enable_pin: !PD7
+microsteps: 16
+rotation_distance: 40
+full_steps_per_rotation: 200
+endstop_pin: ^PE5
+#position_endstop: 0
+position_endstop: -1.0                  # start the 300mm print surface at 5mm inset from 310mm X-sized bed edge
+#position_min: 0
+position_min: -1.0
+#position_max: 300
+position_max: 316                       # approximately 3mm margin to physical X-movement range of 320mm
+homing_speed: 50
+homing_retract_speed: 25                # reduced to prevent frame shock
+homing_retract_dist: 5
+second_homing_speed: 10                 # reduced to get better accuracy (not critical)
+
+[stepper_y]
+step_pin: PF6
+dir_pin: !PF7
+enable_pin: !PF2
+microsteps: 16
+rotation_distance: 40
+full_steps_per_rotation: 200
+endstop_pin: ^PJ1
+#position_endstop: 0
+position_endstop: -7.0                  # start the 300mm print surface at 10mm inset from 320mm Y-sized bed edge (requires correct Y-stop mechanical position adjustment)
+#position_min: 0
+position_min: -7.0
+#position_max: 310
+position_max: 306                       # approximately 2mm margin to physical Y-movement limit of 315mm (requires correct Y-stop mechanical position adjustment)
+homing_speed: 50
+homing_retract_speed: 25                # reduced to prevent frame shock
+homing_retract_dist: 5
+second_homing_speed: 10                 # reduced to get better accuracy (not critical)
+
+[stepper_z]
+step_pin: PL3
+dir_pin: !PL1
+enable_pin: !PK0
+microsteps: 16
+rotation_distance: 8
+full_steps_per_rotation: 200
+endstop_pin: probe:z_virtual_endstop
+#position_min: -1
+position_min: -0.75                     # negative to allow for z_offset adjustment
+#position_max: 351
+position_max: 375                       # limit the Z build space to minimise bowden and wire harness rub against the top frame
+homing_speed: 2.4                       # reduced for better capacitive probe accuracy
+homing_retract_speed: 4
+homing_retract_dist: 1.6                # this is conservative: we need less, just enough to overcome mechanical backlash and probe hysteresis
+second_homing_speed: 0.2                # very slow approach speeds are a MUST, even with a high quality capacitive probe; more so with OEM probe
+
+[extruder]
+step_pin: PA4
+dir_pin: PA6
+enable_pin: !PA2
+#rotation_distance: 22.900
+rotation_distance: 22.857               # this is factory configuration of 140 steps/mm that underextrudes (98 mm instead of 100 mm)
+microsteps: 16
+full_steps_per_rotation: 200
+nozzle_diameter: 0.400
+filament_diameter: 1.750
+max_extrude_only_distance: 500.0
+max_extrude_only_velocity: 70.0
+max_extrude_only_accel: 1000.0
+heater_pin: PB4
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: PK5
+control: pid
+#pid_Kp: 22.2
+pid_Kp = 28.213                         # stock Creality hot end with ReXT3D cooling duct @ 50% flow
+#pid_Ki: 1.08
+pid_Ki = 1.774                          # stock Creality hot end with ReXT3D cooling duct @ 50% flow
+#pid_Kd: 114
+pid_Kd = 112.148                        # stock Creality hot end with ReXT3D cooling duct @ 50% flow
+min_extrude_temp: 170
+min_temp: 0
+max_temp: 320
+
+[heater_bed]
+heater_pin: PH5
+sensor_type: EPCOS 100K B57560G104F
+sensor_pin: PK6
+control: pid
+#pid_Kp: 690.34
+pid_Kp = 74.305                         # Creality borosilicate glass bed
+#pid_Ki: 111.47
+pid_Ki = 1.242                          # Creality borosilicate glass bed
+#pid_Kd: 1068.83
+pid_Kd = 1111.784                       # Creality borosilicate glass bed
+min_temp: 0
+max_temp: 150
+
+[fan]
+pin: PH6
+kick_start_time: 0.5
+
+[mcu]
+#serial: /dev/serial/by-id/usb-FTDI_FT232R_USB_UART_AK06VNAB-if00-port0   
+#serial: /dev/ttyPrinter
+#serial: /dev/ttyUSB0
+serial: /dev/serial/by-id/usb_serial_1
+baud: 115200
+restart_method: command
+
+[printer]
+kinematics: cartesian
+#max_velocity: 200
+max_velocity: 300
+#max_accel: 1500
+max_accel: 2500                         # based on Klipper ringing test print with MZV shaper
+#max_accel: 3000
+#max_z_velocity: 5
+#max_z_velocity: 10
+max_z_velocity: 20                      # increased to allow faster non printing moves
+max_z_accel: 100
+
+[exclude_object]
+[input_shaper]
+shaper_freq_x: 31.5                     # stock CR-10S Pro with very well assembled and tuned mechanicals
+shaper_freq_y: 34.0                     # stock CR-10S Pro with very well assembled and tuned mechanicals
+shaper_type: mzv
+
+[probe]
+pin: PD3
+#x_offset: -27
+x_offset: -28                           # as measured on the printer, the offset is actually 28mm
+y_offset: 0
+z_offset: 0                             # this needs to be adjusted for each printer to achieve correct first layer height
+#speed: 4.0
+speed: 0.2                              # very slow approach speeds are a MUST, even with a high quality capacitive probe; more so with OEM probe
+lift_speed: 4.0
+#samples: 2
+samples: 4                              # this is excessive, but it satisfies my OCD tendencies
+#sample_retract_dist: 3.0
+sample_retract_dist: 1.2                # this value is still conservative with a high quality capacitive probe
+
+[safe_z_home]
+#home_xy_position: 177,155
+home_xy_position: 178,150               # this is for 300x300 print surface with 28mm probe to nozzle offset
+speed: 80.0
+z_hop: 10.0
+z_hop_speed: 5.0
+
+[bed_mesh]
+speed: 120
+#horizontal_move_z: 5
+horizontal_move_z: 2.6                  # reduced to speed things up, still conservative
+mesh_min: 12, 12                        # this clears edges and clips with 300x300 bed & ReXT3D or factory part cooling duct
+mesh_max: 288, 288                      # this clears edges and clips with 300x300 bed & ReXT3D or factory part cooling duct
+mesh_min: 10, 10
+mesh_max: 263, 300
+probe_count: 5,5
+fade_start: 1
+fade_end: 10
+
+[bed_screws]
+screw1: 25,30                           # exact screw location based on the X&Y endstops defined above
+screw2: 275,30                          # exact screw location based on the X&Y endstops defined above
+screw3: 275,270                         # exact screw location based on the X&Y endstops defined above
+screw4: 25,270                          # exact screw location based on the X&Y endstops defined above
+probe_height: 0.2                       # use the Creality supplied 0.2mm feeler gauge for manual adjustment to avoid bed damage
+speed: 80
+probe_speed: 3.2                        # can approach faster than bed mesh probing for a coarse manual screw adjustment
+
+[filament_switch_sensor e0_sensor]
+switch_pin: PE4
+pause_on_runout: False
+runout_gcode:
+  PAUSE_PARK
+
+[pause_resume]
+
+[respond]
+default_type: echo
+
+[gcode_arcs]                            # allow use of ArcWelder
+resolution: 0.5
+
+#[t5uid1]
+#firmware: dgus_reloaded
+#update_interval: 1
+#machine_name: CR-10S Pro
+#volume: 40
+#brightness: 50
+#x_min_inset: 26.0                       # 25mm inset from X=0
+#x_max_inset: 41.0                       # 25mm inset from X=300
+#y_min_inset: 37.0                       # 30mm inset from Y=0
+#y_max_inset: 36.0                       # 30mm inset from Y=300
+#z_min: 0                                # avoid accidental bed collisions
+#z_max: 350                              # additional margin for LCD commanded moves
+
+# https://github.com/Desuuuu/klipper-macros
+# If you want to use these macros, follow the instructions from the repository
+# and uncomment the following lines.
+
+#[save_variables]
+#filename: ~/variables.cfg
+#
+#[delayed_gcode macros_initialize]
+#initial_duration: 1
+#gcode:
+#  INITIALIZE_VARIABLE VARIABLE=park_x VALUE=20
+#  INITIALIZE_VARIABLE VARIABLE=park_y VALUE=290
+#  INITIALIZE_VARIABLE VARIABLE=bowden_len VALUE=400
+#
+#[include macros/*.cfg]
+# [resonance_tester]
+# accel_chip: adxl345
+# accel_per_hz: 70
+# probe_points:
+#     150,150,10
+
+# [adxl345]
+# cs_pin: rpi:None
+# spi_speed: 2000000
+# spi_bus: spidev2.0
+
+# [mcu rpi]
+# serial: /tmp/klipper_host_mcu
+
+############################
+#         MACROS
+############################
+
+[gcode_arcs]                            # allow use of ArcWelder
+resolution: 0.5
+
+[gcode_macro CalibrateResonance]
+gcode:
+    BED_ALIGN
+    SHAPER_CALIBRATE
+
+[gcode_macro BED_LEVEL]
+gcode:
+    BED_MESH_CALIBRATE
+
+[gcode_macro G27]
+gcode:
+  {% set default_x = printer.toolhead.axis_minimum.x + 20 %}
+  {% set default_y = printer.toolhead.axis_minimum.y + 20 %}
+
+  {% if 'save_variables' in printer %}
+    {% set svv = printer.save_variables.variables %}
+    {% if 'park_x' in svv %}
+      {% set default_x = svv.park_x %}
+    {% endif %}
+    {% if 'park_y' in svv %}
+      {% set default_y = svv.park_y %}
+    {% endif %}
+  {% endif %}
+
+  {% set x = params.X|default(default_x)|float %}
+  {% set y = params.Y|default(default_y)|float %}
+  {% set z = params.Z|default(20)|float %}
+
+  {% if printer.toolhead.homed_axes != "xyz" %}
+    {action_respond_info("Please home XYZ first")}
+  {% else %}
+    SAVE_GCODE_STATE NAME=G27_state
+    G91
+    G1 Z{z}
+    G90
+    G1 X{x} Y{y} F3000
+    RESTORE_GCODE_STATE NAME=G27_state MOVE=0
+  {% endif %}
+
+[gcode_macro G29]
+gcode:
+  {% set t = params.T|default(0)|float %}
+
+  {% if printer.idle_timeout.state == "Printing" %}
+    {action_respond_info("This command cannot be used while printing")}
+  {% elif printer.toolhead.homed_axes != "xyz" %}
+    {action_respond_info("Please home XYZ first")}
+  {% else %}
+    SAVE_GCODE_STATE NAME=G29_state
+    G90
+    G1 Z10 F240
+    {% if t > 30.0 %}
+      M190 S{t}
+    {% endif %}
+    BED_MESH_CALIBRATE
+    {% if 'S' in params %}
+      M140 S{params.S}
+    {% endif %}
+    G90
+    G1 Z10 F240
+    G1 X150 Y155 F6000
+    RESTORE_GCODE_STATE NAME=G29_state MOVE=0
+  {% endif %}
+
+[gcode_macro BED_ALIGN]
+gcode:
+    {% if printer.toolhead.homed_axes != 'XYZ' %}
+        G28
+    {% endif %}
+    #Z_TILT_ADJUST
+    #G28 Z
+
+[gcode_macro INITIALIZE_VARIABLE]
+gcode:
+  {% if 'VARIABLE' not in params %}
+    {action_respond_info("Missing VARIABLE parameter")}
+  {% elif 'VALUE' not in params %}
+    {action_respond_info("Missing VALUE parameter")}
+  {% else %}
+    {% set svv = printer.save_variables.variables %}
+    {% if params.VARIABLE not in svv %}
+      {% set escaped = params.VALUE|replace("\"", "\\\"") %}
+      SAVE_VARIABLE VARIABLE={params.VARIABLE} VALUE="{escaped}"
+    {% endif %}
+  {% endif %}
+
+[gcode_macro LAZY_HOME]
+gcode:
+  {% if printer.toolhead.homed_axes != "xyz" %}
+    G28
+  {% endif %}
+
+[gcode_macro M204]
+rename_existing: M204.1
+gcode:
+  {% set f = params.F|default(0.5)|float %}
+
+  {% if 'S' in params %}
+    {% set s = params.S|float %}
+    SET_VELOCITY_LIMIT ACCEL={s} ACCEL_TO_DECEL={ s * f }
+  {% else %}
+    {% if 'P' in params %}
+      {% set p = params.P|float %}
+      {% if 'T' in params %}
+        {% set t = params.T|float %}
+        {% if p < t %}
+          SET_VELOCITY_LIMIT ACCEL={p} ACCEL_TO_DECEL={ p * f }
+        {% else %}
+          SET_VELOCITY_LIMIT ACCEL={t} ACCEL_TO_DECEL={ t * f }
+        {% endif %}
+      {% else %}
+        SET_VELOCITY_LIMIT ACCEL={p} ACCEL_TO_DECEL={ p * f }
+      {% endif %}
+    {% elif 'T' in params %}
+      {% set t = params.T|float %}
+      SET_VELOCITY_LIMIT ACCEL={t} ACCEL_TO_DECEL={ t * f }
+    {% endif %}
+  {% endif %}
+
+[gcode_macro BOOTUP_CALIBRATE]
+gcode:
+    BED_ALIGN
+    BED_LEVEL
+
+[gcode_macro M205]
+gcode:
+  {% if 'X' in params %}
+    SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY={params.X}
+  {% elif 'Y' in params %}
+    SET_VELOCITY_LIMIT SQUARE_CORNER_VELOCITY={params.Y}
+  {% endif %}
+
+[gcode_macro M81]
+gcode:
+    set_pin pin=ps_on value=0
+    set_pin pin=fan1 value=0
+
+[gcode_macro M701]
+gcode:
+  {% set default_u = 100 %}
+
+  {% if 'save_variables' in printer %}
+    {% set svv = printer.save_variables.variables %}
+    {% if 'bowden_len' in svv %}
+      {% set default_u = svv.bowden_len %}
+    {% endif %}
+  {% endif %}
+
+  {% set i = params.I|default(30)|float %}
+  {% set i_f = params.IF|default(180)|float %}
+  {% set u = params.U|default(default_u)|float %}
+  {% set u_f = params.UF|default(360)|float %}
+  {% set p = params.P|default(30)|float %}
+  {% set p_f = params.PF|default(180)|float %}
+
+  {% if printer.idle_timeout.state == "Printing" and not printer.pause_resume.is_paused %}
+    {action_respond_info("This command cannot be used while printing")}
+  {% elif printer.extruder.temperature < 170 %}
+    {action_respond_info("Extruder temperature too low")}
+  {% else %}
+    SAVE_GCODE_STATE NAME=M701_state
+    M83
+    {% if i > 0.0 %}
+      G1 E{i} F{i_f}
+    {% endif %}
+    {% if u > 0.0 %}
+      G1 E{u} F{u_f}
+    {% endif %}
+    {% if p > 0.0 %}
+      G1 E{p} F{p_f}
+    {% endif %}
+    RESTORE_GCODE_STATE NAME=M701_state MOVE=0
+  {% endif %}
+
+[gcode_macro M702]
+gcode:
+  {% set default_u = 100 %}
+
+  {% if 'save_variables' in printer %}
+    {% set svv = printer.save_variables.variables %}
+    {% if 'bowden_len' in svv %}
+      {% set default_u = svv.bowden_len %}
+    {% endif %}
+  {% endif %}
+
+  {% set p = params.P|default(8)|float %}
+  {% set p_f = params.PF|default(180)|float %}
+  {% set i = params.I|default(30)|float %}
+  {% set i_f = params.IF|default(180)|float %}
+  {% set u = params.U|default(default_u)|float %}
+  {% set u_f = params.UF|default(360)|float %}
+
+  {% if printer.idle_timeout.state == "Printing" and not printer.pause_resume.is_paused %}
+    {action_respond_info("This command cannot be used while printing")}
+  {% elif printer.extruder.temperature < 170 %}
+    {action_respond_info("Extruder temperature too low")}
+  {% else %}
+    SAVE_GCODE_STATE NAME=M702_state
+    M83
+    {% if p > 0.0 %}
+      G1 E{p} F{p_f}
+    {% endif %}
+    {% if i > 0.0 %}
+      G1 E-{i} F{i_f}
+    {% endif %}
+    {% if u > 0.0 %}
+      G1 E-{u} F{u_f}
+    {% endif %}
+    RESTORE_GCODE_STATE NAME=M702_state MOVE=0
+  {% endif %}
+
+[gcode_macro M900]
+gcode:
+  {% if 'K' in params %}
+    {% if 'E' in params %}
+      SET_PRESSURE_ADVANCE EXTRUDER={params.E} ADVANCE={params.K}
+    {% else %}
+      SET_PRESSURE_ADVANCE ADVANCE={params.K}
+    {% endif %}
+  {% endif %}
+
+[gcode_macro NOTIFY]
+gcode:
+  {% if 'MSG' in params %}
+    RESPOND TYPE=command MSG="action:notification {params.MSG}"
+  {% endif %}
+
+[gcode_macro RUN_ABL]
+gcode:
+    M190 S60
+    G28
+    M104 S0        #switch off heater as it was switched on after homing
+    BED_MESH_CALIBRATE
+    SAVE_CONFIG
+    M140 S0
+    M104 S0
+
+[gcode_macro START_PRINT]
+gcode:
+    #BED_TEMP={material_bed_temperature_layer_0}
+  {% set BED_TEMP = params.BED_TEMP|default(0)|float %}
+    #EXTRUDER_TEMP={material_print_temperature_layer_0}
+    #HOTEND_TEMP={material_print_temperature_layer_0}
+  {% set HOTEND_TEMP = params.HOTEND_TEMP|default(0)|float %}
+    #{% set BED_TEMP = params.BED_TEMP|default(60)|float %}
+    #{% set EXTRUDER_TEMP = params.EXTRUDER_TEMP|default(190)|float %}
+    {% set toolTemp = params.HOTEND_TEMP|int %}
+    {% set bedTemp = params.BED_TEMP|int %}
+    M140 S{bedTemp}                    # set Bed temp to target
+    M104 S150                            # hotend temperature for homing
+    M82                                 #absolute extrusion mode
+
+    #SET_GCODE_VARIABLE MACRO=<macro_name> VARIABLE=<name> VALUE=<value>
+    M220 S100                             #Reset Feedrate
+    M221 S100                             #Reset Flowrate
+
+    {% if printer.homed_axes != 'XYZ' %}
+        {% if bedTemp >= 50 %}
+            TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM=50    # wait for bed to be over 50
+        {% endif %}
+        TEMPERATURE_WAIT SENSOR=extruder MINIMUM=140
+        M104 S0                            # extruder heater off
+        G28                                # home all axes
+    {% endif %}
+    G90                                    # absolute positioning
+
+    M104 S{toolTemp -70}                     #{ params.hotend_temp - 70 }
+    TEMPERATURE_WAIT SENSOR=heater_bed MINIMUM={bedTemp - 10}
+
+    # Set temperature and move to edge of bed to avoid drooping onto it
+    G0 Z20
+    G0 X0 Y0
+    M104 S{toolTemp}                        # wait for Hotend Temp
+    TEMPERATURE_WAIT SENSOR=extruder MINIMUM={toolTemp - 1}
+
+    # And we can now draw our purge line
+    SET_VELOCITY_LIMIT VELOCITY=100 ACCEL=1200 ACCEL_TO_DECEL=600 SQUARE_CORNER_VELOCITY=5
+    #M201 X500.00 Y500.00 Z100.00 E5000.00 ;Setup machine max acceleration
+  #M203 X500.00 Y500.00 Z10.00 E50.00 ;Setup machine max feedrate
+  #M204 P500.00 R1000.00 T500.00 ;Setup Print/Retract/Travel acceleration
+  #M205 X8.00 Y8.00 Z0.40 E5.00 ;Setup Jerk
+  #M220 S100 ;Reset Feedrate
+  #M221 S100 ;Reset Flowrate
+  #G28 ;Home
+  #G29 ;Auto bed Level
+  G92 E0                                 #Reset Extruder
+    G1 Z2.0 F3000                             #Move Z Axis up
+    G1 X0 Y20 Z0.28                        #Move to start position
+    G1 X0 Y200.0 Z0.28 E15                   #Draw the first line
+    G1 X0 Y200.0 Z0.28                         #Move to side a little
+    G1 X0.5 Y20 Z0.28 E30                     #Draw the second line
+    G92 E0                                 #Reset Extruder
+    G1 Z2.0 F3000                             #Move Z Axis up
+    #SET_VELOCITY_LIMIT VELOCITY=200 ACCEL=5000 ACCEL_TO_DECEL=2500 SQUARE_CORNER_VELOCITY=75    #speedBenchy settings
+
+[gcode_macro END_PRINT]
+gcode:
+  G91 #Relative positioning
+  G1 E-2 F2700 #Retract a bit
+  G1 E-2 Z0.2 F2400 #Retract and raise Z
+  G1 X5 Y5 F3000 #Wipe out
+  G1 Z10 #Raise Z more
+  G90 #Absolute positioning
+  #G1 X0 Y{machine_depth} ;Present print
+  G1 X0 Y300 #Present print
+  M106 S0 #Turn-off fan
+  M104 S0 #Turn-off hotend
+  M140 S0 #Turn-off bed
+  M84 X Y E #Disable all steppers but Z
+
+[gcode_macro CANCEL_PRINT]
+description: Cancel the actual running print
+rename_existing: CANCEL_PRINT_BASE
+gcode:
+    TURN_OFF_HEATERS
+    CANCEL_PRINT_BASE
+
+[gcode_macro PAUSE]
+description: Pause the actual running print
+rename_existing: PAUSE_BASE
+# change this if you need more or less extrusion
+variable_extrude: 1.0
+gcode:
+    ##### read E from pause macro #####
+    {% set E = printer["gcode_macro PAUSE"].extrude|float %}
+    ##### set park positon for x and y #####
+    # default is your max posion from your printer.cfg
+    {% set x_park = printer.toolhead.axis_maximum.x|float - 5.0 %}
+    {% set y_park = printer.toolhead.axis_maximum.y|float - 5.0 %}
+    ##### calculate save lift position #####
+    {% set max_z = printer.toolhead.axis_maximum.z|float %}
+    {% set act_z = printer.toolhead.position.z|float %}
+    {% if act_z < (max_z - 2.0) %}
+        {% set z_safe = 2.0 %}
+    {% else %}
+        {% set z_safe = max_z - act_z %}
+    {% endif %}
+    ##### end of definitions #####
+    PAUSE_BASE
+    G91
+    {% if printer.extruder.can_extrude|lower == 'true' %}
+      G1 E-{E} F2100
+    {% else %}
+      {action_respond_info("Extruder not hot enough")}
+    {% endif %}
+    {% if "xyz" in printer.toolhead.homed_axes %}
+      G1 Z{z_safe} F900
+      G90
+      G1 X{x_park} Y{y_park} F6000
+    {% else %}
+      {action_respond_info("Printer not homed")}
+    {% endif %} 
+
+[gcode_macro RESUME]
+description: Resume the actual running print
+rename_existing: RESUME_BASE
+gcode:
+    ##### read E from pause macro #####
+    {% set E = printer["gcode_macro PAUSE"].extrude|float %}
+    #### get VELOCITY parameter if specified ####
+    {% if 'VELOCITY' in params|upper %}
+      {% set get_params = ('VELOCITY=' + params.VELOCITY)  %}
+    {%else %}
+      {% set get_params = "" %}
+    {% endif %}
+    ##### end of definitions #####
+    {% if printer.extruder.can_extrude|lower == 'true' %}
+      G91
+      G1 E{E} F2100
+    {% else %}
+      {action_respond_info("Extruder not hot enough")}
+    {% endif %}  
+    RESUME_BASE {get_params}
+	
+[gcode_macro CANCEL_PRINT]
+description: Cancel the actual running print
+rename_existing: CANCEL_PRINT_BASE
+variable_park: True
+gcode:
+  ## Move head and retract only if not already in the pause state and park set to true
+  {% if printer.pause_resume.is_paused|lower == 'false' and park|lower == 'true'%}
+    _TOOLHEAD_PARK_PAUSE_CANCEL
+  {% endif %}
+  TURN_OFF_HEATERS
+  M106 S0
+  CANCEL_PRINT_BASE
+
+[gcode_macro PAUSE]
+description: Pause the actual running print
+rename_existing: PAUSE_BASE
+gcode:
+  PAUSE_BASE
+  _TOOLHEAD_PARK_PAUSE_CANCEL
+
+[gcode_macro RESUME]
+description: Resume the actual running print
+rename_existing: RESUME_BASE
+gcode:
+  ##### read extrude from  _TOOLHEAD_PARK_PAUSE_CANCEL  macro #####
+  {% set extrude = printer['gcode_macro _TOOLHEAD_PARK_PAUSE_CANCEL'].extrude %}
+  #### get VELOCITY parameter if specified ####
+  {% if 'VELOCITY' in params|upper %}
+    {% set get_params = ('VELOCITY=' + params.VELOCITY)  %}
+  {%else %}
+    {% set get_params = "" %}
+  {% endif %}
+  ##### end of definitions #####
+  {% if printer.extruder.can_extrude|lower == 'true' %}
+    M83
+    G1 E{extrude} F2100
+    {% if printer.gcode_move.absolute_extrude |lower == 'true' %} M82 {% endif %}
+  {% else %}
+    {action_respond_info("Extruder not hot enough")}
+  {% endif %}
+  RESUME_BASE {get_params}
+
+[gcode_macro PAUSE_PARK]
+gcode:
+  {% set default_x = printer.toolhead.axis_minimum.x + 20 %}
+  {% set default_y = printer.toolhead.axis_minimum.y + 20 %}
+
+  {% if 'save_variables' in printer %}
+    {% set svv = printer.save_variables.variables %}
+    {% if 'park_x' in svv %}
+      {% set default_x = svv.park_x %}
+    {% endif %}
+    {% if 'park_y' in svv %}
+      {% set default_y = svv.park_y %}
+    {% endif %}
+  {% endif %}
+
+  {% set x = params.X|default(default_x)|float %}
+  {% set y = params.Y|default(default_y)|float %}
+  {% set z = params.Z|default(20)|float %}
+  {% set r = params.R|default(3)|float %}
+
+  {% if printer.pause_resume.is_paused %}
+    {action_respond_info("Already paused")}
+  {% elif printer.toolhead.homed_axes != "xyz" %}
+    {action_respond_info("Please home XYZ first")}
+  {% else %}
+    PAUSE
+    {% if r > 0.0 %}
+      RETRACT D={r}
+    {% endif %}
+    G27 X{x} Y{y} Z{z}
+  {% endif %}
+
+[gcode_macro POST_END]
+gcode:
+  CLEAR_PAUSE
+  {% if 't5uid1' in printer %}
+    DGUS_PRINT_END
+  {% endif %}
+  M220 S100
+  M221 S100
+  M900 K0
+  {% if printer.extruder.temperature >= 170 %}
+    M83
+    G91
+    G1 E-2 F2400
+    G1 E-2 Z5 F2400
+  {% endif %}
+  M82
+  G90
+  G27
+  M104 S0
+  M140 S0
+  M106 S0
+  M84 X Y E
+  SAVE_IF_SET
+
+[gcode_macro POWEROFF]
+gcode:
+  RESPOND TYPE=command MSG=action:poweroff
+
+[gcode_macro PRE_START]
+gcode:
+  {% set wz = params.WZ|default(0.25)|float %}
+  {% set wn = params.WN|default(0.4)|float %}
+  CLEAR_PAUSE
+  M106 S0
+  M220 S100
+  M221 S100
+  M900 K0
+  {% if 't5uid1' in printer %}
+    DGUS_PRINT_START
+  {% endif %}
+  G28
+  WIPE_LINE Z={wz} N={wn}
+
+[gcode_macro RETRACT]
+gcode:
+  {% set f = params.F|default(600)|float %}
+
+  {% if 'D' in params %}
+    {% if printer.idle_timeout.state == "Printing" and not printer.pause_resume.is_paused %}
+      {action_respond_info("This command cannot be used while printing")}
+    {% elif printer.extruder.temperature < 170 %}
+      {action_respond_info("Extruder temperature too low")}
+    {% else %}
+      SAVE_GCODE_STATE NAME=RETRACT_state
+      M83
+      G1 E-{params.D} F{f}
+      RESTORE_GCODE_STATE NAME=RETRACT_state MOVE=0
+    {% endif %}
+  {% endif %}
+
+[gcode_macro SAVE_AT_END]
+variable_save: 0
+gcode:
+  SET_GCODE_VARIABLE MACRO=SAVE_AT_END VARIABLE=save VALUE=1
+
+[gcode_macro SAVE_IF_SET]
+gcode:
+  {% if printer["gcode_macro SAVE_AT_END"].save == 1 %}
+    SAVE_CONFIG
+  {% endif %}
+
+[gcode_macro WIPE_LINE]
+gcode:
+  {% set z = params.Z|default(0.25)|float %}
+  {% set n = params.N|default(0.4)|float %}
+
+  {% if printer.toolhead.homed_axes != "xyz" %}
+    {action_respond_info("Please home XYZ first")}
+  {% elif printer.extruder.temperature < 170 %}
+    {action_respond_info("Extruder temperature too low")}
+  {% else %}
+    SAVE_GCODE_STATE NAME=WIPE_LINE_state
+    M82
+    G90
+    G92 E0
+    G1 X10 Y20 Z5 F3000
+    G1 Z{z} F3000
+    G1 X10 Y150 F1500 E10.83
+    G1 X{ n + 10.0 } F5000
+    G1 Y22 F1500 E21.5
+    G1 Y20 F5000
+    RESTORE_GCODE_STATE NAME=WIPE_LINE_state MOVE=0
+  {% endif %}
+
+[gcode_macro _TOOLHEAD_PARK_PAUSE_CANCEL]
+description: Helper: park toolhead used in PAUSE and CANCEL_PRINT
+variable_extrude: 1.0
+gcode:
+  ##### set park positon for x and y #####
+  # default is your max posion from your printer.cfg
+  {% set x_park = printer.toolhead.axis_maximum.x|float - 5.0 %}
+  {% set y_park = printer.toolhead.axis_maximum.y|float - 5.0 %}
+  {% set z_park_delta = 2.0 %}
+  ##### calculate save lift position #####
+  {% set max_z = printer.toolhead.axis_maximum.z|float %}
+  {% set act_z = printer.toolhead.position.z|float %}
+  {% if act_z < (max_z - z_park_delta) %}
+    {% set z_safe = z_park_delta %}
+  {% else %}
+    {% set z_safe = max_z - act_z %}
+  {% endif %}
+  ##### end of definitions #####
+  {% if printer.extruder.can_extrude|lower == 'true' %}
+    M83
+    G1 E-{extrude} F2100
+    {% if printer.gcode_move.absolute_extrude |lower == 'true' %} M82 {% endif %}
+  {% else %}
+    {action_respond_info("Extruder not hot enough")}
+  {% endif %}
+  {% if "xyz" in printer.toolhead.homed_axes %}
+    G91
+    G1 Z{z_safe} F900
+    G90
+    G1 X{x_park} Y{y_park} F6000
+    {% if printer.gcode_move.absolute_coordinates|lower == 'false' %} G91 {% endif %}
+  {% else %}
+    {action_respond_info("Printer not homed")}
+  {% endif %}
+
+#[delayed_gcode macros_initialize]
+#initial_duration: 0.0
+
+## ------------------------- Filament Change --------------------------
+## M600: Filament Change. This macro will pause the printer, move the
+## tool to the change position, and retract the filament 50mm. Adjust
+## the retraction settings for your own extruder. After filament has
+## been changed, the print can be resumed from its previous position
+## with the "RESUME" gcode.
+#
+#[gcode_macro M600]
+#gcode:
+#    {% set X = 0 %}
+#    {% set Y = 0 %}
+#    {% set Z = 20 %}
+#    {% set RetractionAmnt = 500 %}
+#    SAVE_GCODE_STATE NAME=M600_state
+#    PAUSE
+#    G91
+#    G1 E-.8 F2700
+#    G1 Z{Z}
+#    G90
+#    G1 X{X} Y{Y} F3000
+#    G91
+#    G1 E-{RetractionAmnt} F1000
+#    RESTORE_GCODE_STATE NAME=M600_state
+## --------------------------------------------------------------------
+
+#[gcode_macro M600]
+#gcode:
+#  {% set default_x = printer.toolhead.axis_minimum.x + 20 %}
+#  {% set default_y = printer.toolhead.axis_minimum.y + 20 %}
+#  {% set default_e = 100 %}
+#
+#  {% if 'save_variables' in printer %}
+#    {% set svv = printer.save_variables.variables %}
+#    {% if 'park_x' in svv %}
+#      {% set default_x = svv.park_x %}
+#    {% endif %}
+#    {% if 'park_y' in svv %}
+#      {% set default_y = svv.park_y %}
+#    {% endif %}
+#    {% if 'bowden_len' in svv %}
+#      {% set default_e = svv.bowden_len %}
+#    {% endif %}
+#  {% endif %}
+#
+#  {% set x = params.X|default(default_x)|float %}
+#  {% set y = params.Y|default(default_y)|float %}
+#  {% set z = params.Z|default(20)|float %}
+#  {% set e = params.E|default(default_e)|float %}
+#
+#  {% if printer.pause_resume.is_paused %}
+#    {action_respond_info("Already paused")}
+#  {% elif printer.toolhead.homed_axes != "xyz" %}
+#    {action_respond_info("Please home XYZ first")}
+#  {% else %}
+#    PAUSE_PARK X={x} Y={y} Z={z}
+#    M702 U{e}
+#  {% endif %}

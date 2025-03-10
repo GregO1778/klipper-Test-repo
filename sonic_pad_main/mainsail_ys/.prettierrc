@@ -1,0 +1,31 @@
+{
+    "tabWidth": 4,
+    "singleQuote": true,
+    "semi": false,
+    "printWidth": 120,
+    "bracketSameLine": true,
+    "trailingComma": "es5",
+    "htmlWhitespaceSensitivity": "ignore",
+    "overrides": [
+        {
+            "files": "*.yml",
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": "*.md",
+            "options": {
+                "tabWidth": 2
+            }
+        },
+        {
+            "files": "src/locales/*.json",
+            "options": {
+                "plugins": ["prettier-plugin-sort-json"],
+                "jsonRecursiveSort": true,
+                "jsonSortOrder": "{ \"placeThisFirst\": null, \"/^[a-zA-Z0-9]/\": \"caseInsensitiveNumeric\"  }"
+            }
+        }
+    ]
+}

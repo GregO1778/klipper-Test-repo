@@ -1,0 +1,41 @@
+# Perform continuous integration tests on updates and pull requests
+# Needs /bin/bash in run script section
+# Change permissions of script with git update-index --chmod=+x "script_name".sh
+
+name: Build test
+on: [push, pull_request]
+
+jobs:
+  build:
+    #runs-on: ubuntu-18.04
+    #runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    steps:
+    #- uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
+    - name: Setup cache
+      #uses: actions/cache@v2
+      uses: actions/cache@v3
+      with:
+        path: ci_cache
+        key: ${{ runner.os }}-build-${{ hashFiles('klipper/scripts/ci-install.sh') }}
+
+    #- name: edit permissions
+        #run: chmod -R 777 ./*
+
+    - name: Prepare tests
+      run: /bin/bash ./klipper/scripts/ci-install.sh
+
+    - name: Test
+      run: /bin/bash ./klipper/scripts/ci-build.sh 2>&1
+
+    - name: Upload micro-controller data dictionaries
+      #uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-dict
+        path: ci_build/dict
+
+    #- name: Prod
+      #run: /bin/bash ./klipper/scripts/ci-prod_build.sh 2>&1

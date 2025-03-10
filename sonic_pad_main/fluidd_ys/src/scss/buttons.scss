@@ -1,0 +1,25 @@
+/* Prevent zoom on mobile devices when furiosly clicking buttons */
+button .v-btn {
+  touch-action: manipulation;
+}
+
+button .v-icon {
+  touch-action: manipulation;
+}
+
+.v-btn-toggle > .v-btn.v-btn {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+
+  &:first-child {
+    border-left: 0 !important;
+  }
+  &:last-child {
+    border-right: 0 !important;
+  }
+}
+
+.v-toolbar__content .v-btn.v-btn--icon.v-size--default {
+  width: 40px !important;
+  height: 40px !important;
+}

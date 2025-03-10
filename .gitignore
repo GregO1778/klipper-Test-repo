@@ -1,9 +1,0 @@
-out
-*.so
-*.pyc
-.config
-.config.old
-klippy/.version
-klipper_repos.txt
-klipper/DGUS_display/UI/marlin_touch_screen.7z
-DGUS_display/UI/marlin_touch_screen.7z

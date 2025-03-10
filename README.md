@@ -1,4 +1,4 @@
-#Intro
+# Intro
 This is a fork of the Creality "sonic_pad_os" repo.  I forked this repo for three reasons:
 1. Creality has unfortunatly abanded this repo and product in their usual fashin (get it to 90%-95% complete then never make any more updates but still continue to sell the product) so I am attempting to get this repo back up and going so that newer versions of Klipper can be run on the Sonic Pad
 2. The repo on Creality's github page can nolonger be built as it is.  Too many of the files cannot be downloaded from the specified locations in teh "MakeFile" and creality has not supplied those files.  I have tracked down all of the files and included them in the "dl" folder so that this project can once again be built without the need to track all of the files down
